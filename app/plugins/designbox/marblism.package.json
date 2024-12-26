@@ -1,0 +1,9 @@
+{
+  "name": "designbox",
+  "version": "1.0.2",
+  "description": "A plugin providing reusable UI components and layouts for React applications.",
+  "dependencies": [],
+  "devDependencies": ["styled-components"],
+  "pluginDependencies": [],
+  "keywords": ["ui", "design-system"]
+}

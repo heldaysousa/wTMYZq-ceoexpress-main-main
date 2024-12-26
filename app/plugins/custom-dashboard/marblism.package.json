@@ -1,0 +1,8 @@
+{
+  "name": "custom-dashboard",
+  "version": "1.0.2",
+  "description": "Enable your users to build their own dashboard from your app's data",
+  "dependencies": ["recharts", "lodash"],
+  "devDependencies": ["@types/lodash"],
+  "pluginDependencies": ["filter-manager"]
+}

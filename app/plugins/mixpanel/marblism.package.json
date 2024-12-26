@@ -1,0 +1,9 @@
+{
+  "name": "mixpanel",
+  "version": "1.0.6",
+  "description": "Plugin to integrate Mixpanel analytics",
+  "dependencies": ["mixpanel"],
+  "devDependencies": ["@types/mixpanel"],
+  "targetPath": "/app/plugins/mixpanel",
+  "keywords": ["analytics", "mixpanel"]
+}

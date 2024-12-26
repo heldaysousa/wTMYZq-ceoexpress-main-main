@@ -1,0 +1,7 @@
+{
+  "name": "filter-manager",
+  "version": "1.0.1",
+  "description": "The Filter Manager is a component that provides a flexible filtering interface.",
+  "dependencies": ["lodash"],
+  "devDependencies": ["@types/lodash"]
+}

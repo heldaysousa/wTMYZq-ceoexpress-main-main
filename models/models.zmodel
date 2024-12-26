@@ -1,0 +1,195 @@
+enum UserStatus {
+    INVITED
+    VERIFIED
+}
+
+model User {
+    id              String         @id @default(uuid())
+    name            String?
+    email           String?        @unique
+    pictureUrl      String?        @default('https://i.imgur.com/ZdJSK3Y.jpeg')
+    tokenInvitation String?
+
+    status          UserStatus     @default(VERIFIED)
+
+    // this is the role of the user for the application
+    globalRole      String         @default('USER')
+    password        String?        @password @omit
+    customDashboard Json?
+    monthlyGoal     Float?
+    createdAt       DateTime       @default(now())
+    updatedAt       DateTime       @updatedAt @default(now())
+
+    clients         Client[]       @relation("userClients")
+    services        Service[]      @relation("user")
+    teamMembers     TeamMember[]   @relation("user")
+    appointments    Appointment[]  @relation("user")
+    transactions    Transaction[]  @relation("user")
+    subscriptions   Subscription[] @relation("user")
+    notifications   Notification[] @relation("user")
+
+    @@auth()
+    @@auth()
+    @@allow("all", auth().id == this.id)
+    @@allow('all', auth().globalRole == 'ADMIN')
+
+    //we only allow that user to register if they don't create an admin role
+    @@allow("create", globalRole != 'ADMIN')
+    @@allow("read", true)
+}
+
+model Client {
+    id             String        @id @default(cuid())
+    name           String
+    email          String?       @unique
+    phoneNumber    String?
+    notes          String?
+    lastVisit      DateTime?
+    serviceHistory Json[]
+    loyaltyPoints  Int           @default(0)
+    userId         String
+    user           User          @relation("userClients", fields: [userId], references: [id])
+    appointments   Appointment[] @relation("client")
+    createdAt      DateTime      @default(now())
+    updatedAt      DateTime      @updatedAt @default(now())
+    @@allow("all", true)
+}
+
+model Service {
+
+    id           String        @id @default(uuid())
+    name         String?
+    description  String?
+    price        Float?
+    duration     Float?
+    category     String?
+
+    isActive     Boolean
+    imageUrl     String
+    promotion    Json
+    availability Json
+    userId       String?
+    user         User?         @relation(fields: [userId], references: [id], name: "user")
+    appointments Appointment[] @relation("service")
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt @default(now())
+    @@allow("all", true)
+}
+
+model TeamMember {
+
+    id           String   @id @default(uuid())
+    name         String?
+    role         String?
+
+    isActive     Boolean
+    availability Json
+    phoneNumber  String
+    userId       String?
+    user         User?    @relation(fields: [userId], references: [id], name: "user")
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt @default(now())
+    @@allow("all", true)
+}
+
+model Appointment {
+
+    id        String    @id @default(uuid())
+    startTime DateTime?
+    endTime   DateTime?
+    status    String?
+
+    clientId  String?
+    client    Client?   @relation(fields: [clientId], references: [id], name: "client")
+    serviceId String?
+    service   Service?  @relation(fields: [serviceId], references: [id], name: "service")
+    userId    String?
+    user      User?     @relation(fields: [userId], references: [id], name: "user")
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt @default(now())
+    @@allow("all", true)
+    @@index([startTime])
+}
+
+model Transaction {
+    id        String    @id @default(uuid())
+    name      String?
+    amount    Float?    @default(0)
+    type      String?
+    category  String?
+    date      DateTime? @default(now())
+    userId    String?
+    user      User?     @relation(fields: [userId], references: [id], name: "user")
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt @default(now())
+    @@allow("all", true)
+    @@index([userId])
+}
+
+model Subscription {
+
+    id        String    @id @default(uuid())
+    plan      String?
+    startDate DateTime?
+    endDate   DateTime?
+    status    String?
+    content   String?   @default('')  // Add this field to store push subscription data
+    userId    String?
+    user      User?     @relation(fields: [userId], references: [id], name: "user")
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt @default(now())
+    @@allow("all", true)
+}
+
+model Notification {
+
+    id                String    @id @default(uuid())
+    type              String
+    message           String?
+
+    isRead            Boolean?
+    relatedEntityId   String?
+    relatedEntityType String?
+    sentAt            DateTime?
+    userId            String?
+    user              User?     @relation(fields: [userId], references: [id], name: "user")
+    createdAt         DateTime  @default(now())
+    updatedAt         DateTime  @updatedAt @default(now())
+    @@allow("all", true)
+    @@index([isRead])
+    @@index([createdAt])
+}
+
+
+model HelpContent {
+
+    id        String   @id @default(uuid())
+    title     String?
+    content   String?
+    type      String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt @default(now())
+    @@allow("all", true)
+}
+
+model SupportTicket {
+    id          String   @id @default(uuid())
+    subject     String
+    description String
+    userEmail   String
+    status      String   @default('OPEN')
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    @@allow('all', true)
+}
+
+
+model Task {
+    id         String @id @default(uuid())
+    status     String
+    assigneeId String
+    value      Int?
+
+    @@allow('all', true)
+}
